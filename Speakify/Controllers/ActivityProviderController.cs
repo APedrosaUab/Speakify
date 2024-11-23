@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Speakify.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,9 +11,15 @@ public class ActivityProviderController : ControllerBase
     /// Retorna a página de configuração da atividade (HTML).
     /// </summary>
     [HttpGet("config-page")]
-    public ContentResult GetConfigurationPage()
+    public ActionResult GetConfigurationPage()
     {
-        string htmlContent = "<html><body>" +
+        string htmlContent = "<!DOCTYPE html>" +
+                             "<html>" +
+                             "<head>" +
+                             "<meta charset='UTF-8'>" +
+                             "<title>Configuração da Atividade</title>" +
+                             "</head>" +
+                             "<body>" +
                              "<h1>Configuração da Atividade</h1>" +
                              "<form>" +
                              "<label>Tipo de Exercício:</label>" +
@@ -35,8 +42,9 @@ public class ActivityProviderController : ControllerBase
                              "<input type='url' name='link_material_apoio'/><br/>" +
                              "<button type='submit'>Salvar</button>" +
                              "</form>" +
-                             "</body></html>";
-        return Content(htmlContent, "text/html");
+                             "</body>" +
+                             "</html>";
+        return Content(htmlContent, "text/html; charset=utf-8");
     }
 
     /// <summary>
@@ -46,18 +54,19 @@ public class ActivityProviderController : ControllerBase
     public IActionResult GetJsonParams()
     {
         var parameters = new List<object>
-        {
-            new { name = "tipo_exercicio", type = "text/plain" },
-            new { name = "nivel_dificuldade", type = "integer" },
-            new { name = "objetivo_atividade", type = "text/plain" },
-            new { name = "tempo_estimado", type = "integer" },
-            new { name = "instrucoes_exercicio", type = "text/plain" },
-            new { name = "numero_questoes", type = "integer" },
-            new { name = "link_material_apoio", type = "URL" }
-        };
+    {
+        new { name = "tipo_exercicio", type = "text/plain" },
+        new { name = "nivel_dificuldade", type = "integer" },
+        new { name = "objetivo_atividade", type = "text/plain" },
+        new { name = "tempo_estimado", type = "integer" },
+        new { name = "instrucoes_exercicio", type = "text/plain" },
+        new { name = "numero_questoes", type = "integer" },
+        new { name = "link_material_apoio", type = "URL" }
+    };
 
         return Ok(parameters);
     }
+
 
     /// <summary>
     /// Retorna a lista de analytics disponíveis.
@@ -70,12 +79,16 @@ public class ActivityProviderController : ControllerBase
             quantAnalytics = new[]
             {
                 new { name = "Tempo total dedicado", type = "float" },
-                new { name = "Número de atividades concluídas", type = "integer" }
+                new { name = "Número de atividades concluídas", type = "integer" },
+                new { name = "Pontuação média", type = "float" },
+                new { name = "Número de tentativas", type = "integer" },
+                new { name = "Frequência de acesso", type = "integer" }
             },
             qualAnalytics = new[]
             {
-                new { name = "Resumo do progresso", type = "text/plain" },
-                new { name = "Mapa de calor", type = "URL" }
+                new { name = "Comentários sobre o progresso", type = "text/plain" },
+                new { name = "Sugestões para melhoria", type = "text/plain" },
+                new { name = "Feedback qualitativo do aluno", type = "text/plain" },
             }
         };
 
@@ -86,9 +99,9 @@ public class ActivityProviderController : ControllerBase
     /// Realiza o deploy inicial da atividade.
     /// </summary>
     [HttpGet("deploy-activity")]
-    public IActionResult DeployActivity([FromQuery] string activityID)
+    public IActionResult DeployActivity(int activityID)
     {
-        string activityUrl = $"https://speakify-u5hk.onrender.com/activity/{activityID}";
+        string activityUrl = $"https://speakify-u5hk.onrender.com?activity={activityID}";
 
         return Ok(new { url = activityUrl });
     }
@@ -97,72 +110,30 @@ public class ActivityProviderController : ControllerBase
     /// Regista o acesso do estudante à atividade.
     /// </summary>
     [HttpPost("student-access")]
-    public IActionResult StudentAccess([FromBody] dynamic requestData)
+    public IActionResult StudentAccess([FromBody]StudentAccessRequest requestData)
     {
-        string activityUrl = $"https://speakify-u5hk.onrender.com/activity/{requestData.activityID}?studentId={requestData.InvenRAstdID}";
 
-        return Ok(new { url = activityUrl });
+        return Ok("Ficha número " + requestData.ActivityID + " vai ser realizada por " + requestData.InveniraStdID);
     }
 
     /// <summary>
     /// Retorna os dados analíticos da atividade.
     /// </summary>
-    [HttpPost("analytics")]
-    public IActionResult GetActivityAnalytics([FromBody] dynamic requestData)
+    [HttpPost("get-analytics")]
+    public IActionResult GetActivityAnalytics(int inveniraStdID)
     {
-        var analytics = new List<StudentAnalytics>
-        {
-            new StudentAnalytics
-            {
-                InveniraStdID = "1001",
-                QuantAnalytics = new List<QuantitativeAnalytic>
-                {
-                    new QuantitativeAnalytic { Name = "Acedeu à atividade", Value = true },
-                    new QuantitativeAnalytic { Name = "Download documento 1", Value = true },
-                    new QuantitativeAnalytic { Name = "Evolução pela atividade (%)", Value = 33.3 }
-                },
-                QualAnalytics = new List<QualitativeAnalytic>
-                {
-                    new QualitativeAnalytic { Name = "Student activity profile", Value = "https://speakify-u5hk.onrender.com/analytics/11111111" },
-                    new QualitativeAnalytic { Name = "Activity Heat Map", Value = "https://speakify-u5hk.onrender.com/analytics/21111111" }
-                }
-            },
-            new StudentAnalytics
-            {
-                InveniraStdID = "1002",
-                QuantAnalytics = new List<QuantitativeAnalytic>
-                {
-                    new QuantitativeAnalytic { Name = "Acedeu à atividade", Value = true },
-                    new QuantitativeAnalytic { Name = "Download documento 1", Value = false },
-                    new QuantitativeAnalytic { Name = "Evolução pela atividade (%)", Value = 10.0 }
-                },
-                QualAnalytics = new List<QualitativeAnalytic>
-                {
-                    new QualitativeAnalytic { Name = "Student activity profile", Value = "https://speakify-u5hk.onrender.com/analytics/11111112" },
-                    new QualitativeAnalytic { Name = "Activity Heat Map", Value = "https://speakify-u5hk.onrender.com/analytics/21111112" }
-                }
-            }
-        };
+        // Dados simulados
+        var allAnalytics = StudentAnalyticsData.GetAllAnalytics();
 
-        return Ok(analytics);
+        // Filtrar o resultado com base no ID do estudante
+        var studentAnalytics = allAnalytics.Find(analytics => analytics.InveniraStdID == inveniraStdID);
+
+        if (studentAnalytics == null)
+        {
+            return NotFound(new { message = "Nenhum dado encontrado para o ID fornecido." });
+        }
+
+        return Ok(studentAnalytics);
     }
 }
 
-public class QuantitativeAnalytic
-{
-    public string Name { get; set; } = string.Empty;
-    public object Value { get; set; } = string.Empty;
-}
-
-public class QualitativeAnalytic
-{
-    public string Name { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
-}
-
-public class StudentAnalytics
-{
-    public string InveniraStdID { get; set; } = string.Empty;
-    public List<QuantitativeAnalytic> QuantAnalytics { get; set; } = new();
-    public List<QualitativeAnalytic> QualAnalytics { get; set; } = new();
-}
