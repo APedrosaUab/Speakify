@@ -2,16 +2,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
-# Copiar arquivos da solução e do projeto
-COPY Speakify.sln .                        # Copia o arquivo de solução
-COPY Speakify/*.csproj ./Speakify/         # Copia o arquivo .csproj
+# Copiar o arquivo de solução e projetos
+COPY ./*.sln ./                             # Copia o arquivo de solução
+COPY ./Speakify/*.csproj ./Speakify/        # Copia o arquivo do projeto .csproj
 
 # Restaurar dependências
 RUN dotnet restore
 
-# Copiar o restante do código-fonte
-COPY Speakify/. ./Speakify/                # Copia todos os arquivos do projeto
-WORKDIR /app/Speakify                      # Define o diretório de trabalho como o do projeto
+# Copiar o restante dos arquivos do projeto
+COPY ./Speakify/. ./Speakify/               # Copia todos os arquivos do projeto para a pasta correspondente
+WORKDIR /app/Speakify                       # Define o diretório de trabalho como o do projeto
 
 # Compilar e publicar o aplicativo
 RUN dotnet publish -c Release -o /out
