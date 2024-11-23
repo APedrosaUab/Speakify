@@ -1,5 +1,5 @@
-# Use a imagem .NET SDK para construir o projeto
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+# Use a imagem .NET SDK 8.0 para construir o projeto
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -22,8 +22,8 @@ WORKDIR /app/Speakify
 # Compila o projeto
 RUN dotnet publish -c Release -o out
 
-# Use a imagem do runtime .NET para rodar o app
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+# Use a imagem do runtime .NET 8.0 para rodar o app
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 # Define o diretório de trabalho no contêiner de runtime
 WORKDIR /app
