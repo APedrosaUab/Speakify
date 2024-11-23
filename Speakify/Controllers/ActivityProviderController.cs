@@ -85,18 +85,16 @@ public class ActivityProviderController : ControllerBase
     /// <summary>
     /// Realiza o deploy inicial da atividade.
     /// </summary>
-    [HttpPost("deploy-activity")]
-    public IActionResult DeployActivity([FromBody] dynamic requestData)
+    [HttpGet("deploy-activity")]
+    public IActionResult DeployActivity([FromQuery] string activityID)
     {
-        string activityID = requestData.activityID;
         string activityUrl = $"https://speakify-u5hk.onrender.com/activity/{activityID}";
 
-        // Simula qualquer preparação no servidor (e.g., inicialização de registros)
         return Ok(new { url = activityUrl });
     }
 
     /// <summary>
-    /// Registra o acesso do estudante à atividade.
+    /// Regista o acesso do estudante à atividade.
     /// </summary>
     [HttpPost("student-access")]
     public IActionResult StudentAccess([FromBody] dynamic requestData)
