@@ -89,7 +89,7 @@ public class ActivityProviderController : ControllerBase
     public IActionResult DeployActivity([FromBody] dynamic requestData)
     {
         string activityID = requestData.activityID;
-        string activityUrl = $"https://yourAPProvider.com/activity/{activityID}";
+        string activityUrl = $"https://speakify-u5hk.onrender.com/activity/{activityID}";
 
         // Simula qualquer preparação no servidor (e.g., inicialização de registros)
         return Ok(new { url = activityUrl });
@@ -101,7 +101,7 @@ public class ActivityProviderController : ControllerBase
     [HttpPost("student-access")]
     public IActionResult StudentAccess([FromBody] dynamic requestData)
     {
-        string activityUrl = $"https://yourAPProvider.com/activity/{requestData.activityID}?studentId={requestData.InvenRAstdID}";
+        string activityUrl = $"https://speakify-u5hk.onrender.com/activity/{requestData.activityID}?studentId={requestData.InvenRAstdID}";
 
         return Ok(new { url = activityUrl });
     }
@@ -113,68 +113,58 @@ public class ActivityProviderController : ControllerBase
     public IActionResult GetActivityAnalytics([FromBody] dynamic requestData)
     {
         var analytics = new List<StudentAnalytics>
-    {
-        new StudentAnalytics
         {
-            InveniraStdID = "1001",
-            QuantAnalytics = new List<QuantitativeAnalytic>
+            new StudentAnalytics
             {
-                new QuantitativeAnalytic { Name = "Acedeu à atividade", Value = true },
-                new QuantitativeAnalytic { Name = "Download documento 1", Value = true },
-                new QuantitativeAnalytic { Name = "Evolução pela atividade (%)", Value = 33.3 }
+                InveniraStdID = "1001",
+                QuantAnalytics = new List<QuantitativeAnalytic>
+                {
+                    new QuantitativeAnalytic { Name = "Acedeu à atividade", Value = true },
+                    new QuantitativeAnalytic { Name = "Download documento 1", Value = true },
+                    new QuantitativeAnalytic { Name = "Evolução pela atividade (%)", Value = 33.3 }
+                },
+                QualAnalytics = new List<QualitativeAnalytic>
+                {
+                    new QualitativeAnalytic { Name = "Student activity profile", Value = "https://speakify-u5hk.onrender.com/analytics/11111111" },
+                    new QualitativeAnalytic { Name = "Activity Heat Map", Value = "https://speakify-u5hk.onrender.com/analytics/21111111" }
+                }
             },
-            QualAnalytics = new List<QualitativeAnalytic>
+            new StudentAnalytics
             {
-                new QualitativeAnalytic { Name = "Student activity profile", Value = "https://ActivityProvider/?APAnID=11111111" },
-                new QualitativeAnalytic { Name = "Activity Heat Map", Value = "https://ActivityProvider/?APAnID=21111111" }
+                InveniraStdID = "1002",
+                QuantAnalytics = new List<QuantitativeAnalytic>
+                {
+                    new QuantitativeAnalytic { Name = "Acedeu à atividade", Value = true },
+                    new QuantitativeAnalytic { Name = "Download documento 1", Value = false },
+                    new QuantitativeAnalytic { Name = "Evolução pela atividade (%)", Value = 10.0 }
+                },
+                QualAnalytics = new List<QualitativeAnalytic>
+                {
+                    new QualitativeAnalytic { Name = "Student activity profile", Value = "https://speakify-u5hk.onrender.com/analytics/11111112" },
+                    new QualitativeAnalytic { Name = "Activity Heat Map", Value = "https://speakify-u5hk.onrender.com/analytics/21111112" }
+                }
             }
-        },
-        new StudentAnalytics
-        {
-            InveniraStdID = "1002",
-            QuantAnalytics = new List<QuantitativeAnalytic>
-            {
-                new QuantitativeAnalytic { Name = "Acedeu à atividade", Value = true },
-                new QuantitativeAnalytic { Name = "Download documento 1", Value = false },
-                new QuantitativeAnalytic { Name = "Evolução pela atividade (%)", Value = 10.0 }
-            },
-            QualAnalytics = new List<QualitativeAnalytic>
-            {
-                new QualitativeAnalytic { Name = "Student activity profile", Value = "https://ActivityProvider/?APAnID=11111112" },
-                new QualitativeAnalytic { Name = "Activity Heat Map", Value = "https://ActivityProvider/?APAnID=21111112" }
-            }
-        }
-    };
+        };
 
         return Ok(analytics);
-    }
-
-
-    /// <summary>
-    /// Simula uma chamada ao ChatGPT para geração de perguntas.
-    /// </summary>
-    private async Task<string> SimulateChatGPTRequest(dynamic config)
-    {
-        await Task.Delay(500); // Simulação de processamento
-        return "Perguntas geradas com base na configuração fornecida.";
     }
 }
 
 public class QuantitativeAnalytic
 {
-    public string Name { get; set; }
-    public object Value { get; set; } // Aceita diferentes tipos de valores (bool, float, etc.)
+    public string Name { get; set; } = string.Empty;
+    public object Value { get; set; } = string.Empty;
 }
 
 public class QualitativeAnalytic
 {
-    public string Name { get; set; }
-    public string Value { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
 }
 
 public class StudentAnalytics
 {
-    public string InveniraStdID { get; set; }
-    public List<QuantitativeAnalytic> QuantAnalytics { get; set; }
-    public List<QualitativeAnalytic> QualAnalytics { get; set; }
+    public string InveniraStdID { get; set; } = string.Empty;
+    public List<QuantitativeAnalytic> QuantAnalytics { get; set; } = new();
+    public List<QualitativeAnalytic> QualAnalytics { get; set; } = new();
 }
