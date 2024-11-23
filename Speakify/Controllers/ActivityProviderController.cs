@@ -120,7 +120,7 @@ public class ActivityProviderController : ControllerBase
     /// Retorna os dados analíticos da atividade.
     /// </summary>
     [HttpPost("get-analytics")]
-    public IActionResult GetActivityAnalytics(int inveniraStdID)
+    public IActionResult GetActivityAnalytics([FromBody] int inveniraStdID)
     {
         // Dados simulados
         var allAnalytics = StudentAnalyticsData.GetAllAnalytics();
