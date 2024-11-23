@@ -6,15 +6,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Desativar HTTPS Redirection no ambiente Production
-if (builder.Environment.IsProduction())
-{
-    builder.Services.AddHttpsRedirection(options =>
-    {
-        options.HttpsPort = null;
-    });
-}
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
