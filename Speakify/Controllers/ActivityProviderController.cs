@@ -17,26 +17,26 @@ public class ActivityProviderController : ControllerBase
                              "<html>" +
                              "<head>" +
                              "<meta charset='UTF-8'>" +
-                             "<title>Configuração da Atividade</title>" +
+                             "<title>Configuracao da Atividade</title>" +
                              "</head>" +
                              "<body>" +
-                             "<h1>Configuração da Atividade</h1>" +
+                             "<h1>Configuracao da Atividade</h1>" +
                              "<form>" +
-                             "<label>Tipo de Exercício:</label>" +
+                             "<label>Tipo de Exercicio:</label>" +
                              "<select name='tipo_exercicio'>" +
-                             "<option value='gramática'>Gramática</option>" +
-                             "<option value='vocabulário'>Vocabulário</option>" +
-                             "<option value='conversação'>Conversação</option>" +
+                             "<option value='gramatica'>Gramatica</option>" +
+                             "<option value='vocabulario'>Vocabulario</option>" +
+                             "<option value='conversacao'>Conversacao</option>" +
                              "</select><br/>" +
-                             "<label>Nível de Dificuldade:</label>" +
+                             "<label>Nivel de Dificuldade:</label>" +
                              "<input type='number' name='nivel_dificuldade' min='1' max='5'/><br/>" +
                              "<label>Objetivo da Atividade:</label>" +
                              "<input type='text' name='objetivo_atividade'/><br/>" +
                              "<label>Tempo Estimado (minutos):</label>" +
                              "<input type='number' name='tempo_estimado'/><br/>" +
-                             "<label>Instruções:</label>" +
+                             "<label>Instrucoes:</label>" +
                              "<textarea name='instrucoes_exercicio'></textarea><br/>" +
-                             "<label>Número de Questões:</label>" +
+                             "<label>Numero de Questoes:</label>" +
                              "<input type='number' name='numero_questoes'/><br/>" +
                              "<label>Material de Apoio:</label>" +
                              "<input type='url' name='link_material_apoio'/><br/>" +
@@ -46,6 +46,7 @@ public class ActivityProviderController : ControllerBase
                              "</html>";
         return Content(htmlContent, "text/html; charset=utf-8");
     }
+
 
     /// <summary>
     /// Retorna os parâmetros configuráveis no formato JSON.
@@ -113,7 +114,7 @@ public class ActivityProviderController : ControllerBase
     public IActionResult StudentAccess([FromBody]StudentAccessRequest requestData)
     {
 
-        return Ok("Ficha número " + requestData.ActivityID + " vai ser realizada por " + requestData.InveniraStdID);
+        return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizada pelo aluno com ID " + requestData.InveniraStdID);
     }
 
     /// <summary>
