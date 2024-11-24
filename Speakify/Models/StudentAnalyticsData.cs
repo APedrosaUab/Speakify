@@ -9,6 +9,7 @@
                 new StudentAnalytics
                 {
                     InveniraStdID = 1001,
+                    ActivityID = 1,
                     QuantAnalytics = new List<QuantitativeAnalytic>
                     {
                         new QuantitativeAnalytic { Name = "Tempo total dedicado", Value = 120.5 },
@@ -27,6 +28,7 @@
                 new StudentAnalytics
                 {
                     InveniraStdID = 1002,
+                    ActivityID = 1,
                     QuantAnalytics = new List<QuantitativeAnalytic>
                     {
                         new QuantitativeAnalytic { Name = "Tempo total dedicado", Value = 90.0 },

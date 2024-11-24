@@ -10,37 +10,50 @@ public class ActivityProviderController : ControllerBase
     /// <summary>
     /// Retorna a página de configuração da atividade (HTML).
     /// </summary>
-    [HttpGet("config-page")]
+    [HttpGet("config_url")]
     public ActionResult GetConfigurationPage()
     {
         string htmlContent = "<!DOCTYPE html>" +
                              "<html>" +
                              "<head>" +
                              "<meta charset='UTF-8'>" +
-                             "<title>Configuracao da Atividade</title>" +
+                             "<title>Speak!fy: improve your language skills</title>" +
                              "</head>" +
                              "<body>" +
-                             "<h1>Configuracao da Atividade</h1>" +
+                             "<h1>Configuracao de Atividade Inven!ra: Speak!fy</h1>" +
                              "<form>" +
-                             "<label>Tipo de Exercicio:</label>" +
-                             "<select name='tipo_exercicio'>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Tipo de Exercicio:</label>" +
+                             "<select name='tipo_exercicio' style='height: 30px;width: 200px;'>" +
                              "<option value='gramatica'>Gramatica</option>" +
                              "<option value='vocabulario'>Vocabulario</option>" +
                              "<option value='conversacao'>Conversacao</option>" +
-                             "</select><br/>" +
-                             "<label>Nivel de Dificuldade:</label>" +
-                             "<input type='number' name='nivel_dificuldade' min='1' max='5'/><br/>" +
-                             "<label>Objetivo da Atividade:</label>" +
-                             "<input type='text' name='objetivo_atividade'/><br/>" +
-                             "<label>Tempo Estimado (minutos):</label>" +
-                             "<input type='number' name='tempo_estimado'/><br/>" +
-                             "<label>Instrucoes:</label>" +
-                             "<textarea name='instrucoes_exercicio'></textarea><br/>" +
-                             "<label>Numero de Questoes:</label>" +
-                             "<input type='number' name='numero_questoes'/><br/>" +
-                             "<label>Material de Apoio:</label>" +
-                             "<input type='url' name='link_material_apoio'/><br/>" +
-                             "<button type='submit'>Salvar</button>" +
+                             "</select>" +
+                             "</div>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Nivel de Dificuldade:</label>" +
+                             "<input type='number' name='nivel_dificuldade' style='height: 30px;width: 200px;' min='1' max='5'/>" +
+                             "</div>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Objetivo da Atividade:</label>" +
+                             "<input type='text' name='objetivo_atividade' style='height: 30px;width: 200px;'/>" +
+                             "</div>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Tempo Estimado (minutos):</label>" +
+                             "<input type='number' name='tempo_estimado' style='height: 30px;width: 200px;'/>" +
+                             "</div>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Instrucoes:</label>" +
+                             "<textarea name='instrucoes_exercicio' style='height: 30px;min-width: 200px;'></textarea>" +
+                             "</div>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Numero de Questoes:</label>" +
+                             "<input type='number' name='numero_questoes' style='height: 30px;width: 200px;'/>" +
+                             "</div>" +
+                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<label style='width: 150px;display: inline-block; height: 30px;'>Material de Apoio:</label>" +
+                             "<input type='url' name='link_material_apoio' style='height: 30px;width: 200px;'/>" +
+                             "</div>" +
                              "</form>" +
                              "</body>" +
                              "</html>";
@@ -51,7 +64,7 @@ public class ActivityProviderController : ControllerBase
     /// <summary>
     /// Retorna os parâmetros configuráveis no formato JSON.
     /// </summary>
-    [HttpGet("json-params")]
+    [HttpGet("json_params_url")]
     public IActionResult GetJsonParams()
     {
         var parameters = new List<object>
@@ -68,11 +81,41 @@ public class ActivityProviderController : ControllerBase
         return Ok(parameters);
     }
 
+    /// <summary>
+    /// Realiza o deploy inicial da atividade.
+    /// </summary>
+    [HttpGet("user_url")]
+    public IActionResult DeployActivity(int activityID)
+    {
+        string activityUrl = $"https://speakify-u5hk.onrender.com?activity={activityID}";
+
+        return Ok(new { url = activityUrl });
+    }
+
+    /// <summary>
+    /// Retorna os dados analíticos da atividade.
+    /// </summary>
+    [HttpPost("analytics_url")]
+    public IActionResult GetActivityAnalytics([FromBody] int activityID)
+    {
+        // Dados simulados
+        var allAnalytics = StudentAnalyticsData.GetAllAnalytics();
+
+        // Filtrar o resultado com base no ID da Activity
+        var activityAnalytics = allAnalytics.Find(analytics => analytics.ActivityID == activityID);
+
+        if (activityAnalytics == null)
+        {
+            return NotFound(new { message = "Nenhum dado encontrado para o ID da Atividade fornecido." });
+        }
+
+        return Ok(activityAnalytics);
+    }
 
     /// <summary>
     /// Retorna a lista de analytics disponíveis.
     /// </summary>
-    [HttpGet("analytics-list")]
+    [HttpGet("analytics_list_url")]
     public IActionResult GetAnalyticsList()
     {
         var analytics = new
@@ -97,44 +140,16 @@ public class ActivityProviderController : ControllerBase
     }
 
     /// <summary>
-    /// Realiza o deploy inicial da atividade.
-    /// </summary>
-    [HttpGet("deploy-activity")]
-    public IActionResult DeployActivity(int activityID)
-    {
-        string activityUrl = $"https://speakify-u5hk.onrender.com?activity={activityID}";
-
-        return Ok(new { url = activityUrl });
-    }
-
-    /// <summary>
     /// Regista o acesso do estudante à atividade.
     /// </summary>
-    [HttpPost("student-access")]
-    public IActionResult StudentAccess([FromBody]StudentAccessRequest requestData)
+    [HttpPost("provide_student_activity_url")]
+    public IActionResult StudentAccess([FromBody] StudentAccessRequest requestData)
     {
-
-        return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizada pelo aluno com ID " + requestData.InveniraStdID);
+        // Tratamento da lógica toda da instanciação do exercício e da acção do estudante na resolução
+        return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizada pelo aluno com ID " + requestData.InveniraStdID + 
+            "no URL: " + $"https://speakify-u5hk.onrender.com?activity={requestData.ActivityID}&studentID={requestData.InveniraStdID}");
     }
 
-    /// <summary>
-    /// Retorna os dados analíticos da atividade.
-    /// </summary>
-    [HttpPost("get-analytics")]
-    public IActionResult GetActivityAnalytics([FromBody] int inveniraStdID)
-    {
-        // Dados simulados
-        var allAnalytics = StudentAnalyticsData.GetAllAnalytics();
-
-        // Filtrar o resultado com base no ID do estudante
-        var studentAnalytics = allAnalytics.Find(analytics => analytics.InveniraStdID == inveniraStdID);
-
-        if (studentAnalytics == null)
-        {
-            return NotFound(new { message = "Nenhum dado encontrado para o ID fornecido." });
-        }
-
-        return Ok(studentAnalytics);
-    }
+   
 }
 
