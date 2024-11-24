@@ -42,9 +42,9 @@ public class ActivityProviderController : ControllerBase
                              "<label style='width: 150px;display: inline-block; height: 30px;'>Tempo Estimado (minutos):</label>" +
                              "<input type='number' name='tempo_estimado' style='height: 30px;width: 200px;'/>" +
                              "</div>" +
-                             "<div style='height: 50px;width: 500px;display: flex;'>" +
+                             "<div style='height: 50px;min-width: 500px;display: flex;'>" +
                              "<label style='width: 150px;display: inline-block; height: 30px;'>Instrucoes:</label>" +
-                             "<textarea name='instrucoes_exercicio' style='height: 30px;min-width: 200px;'></textarea>" +
+                             "<textarea name='instrucoes_exercicio' style='height: 30px;min-width: 200px; max-height: 40px;'></textarea>" +
                              "</div>" +
                              "<div style='height: 50px;width: 500px;display: flex;'>" +
                              "<label style='width: 150px;display: inline-block; height: 30px;'>Numero de Questoes:</label>" +
@@ -147,7 +147,7 @@ public class ActivityProviderController : ControllerBase
     {
         // Tratamento da lógica toda da instanciação do exercício e da acção do estudante na resolução
         return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizada pelo aluno com ID " + requestData.InveniraStdID + 
-            "no URL: " + $"https://speakify-u5hk.onrender.com?activity={requestData.ActivityID}&studentID={requestData.InveniraStdID}");
+            " no URL: " + $"https://speakify-u5hk.onrender.com?activity={requestData.ActivityID}&studentID={requestData.InveniraStdID}");
     }
 
    
