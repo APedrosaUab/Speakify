@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Speakify.Interfaces; // Importar as interfaces
+using Speakify.Implementations; // Importar as implementações
 using Speakify.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,12 +9,22 @@ using System.Threading.Tasks;
 [Route("[controller]")]
 public class ActivityProviderController : ControllerBase
 {
+    // Dependência da factory (instanciada diretamente aqui, mas poderia ser injetada via DI)
+    private readonly IParameterFactory _parameterFactory;
+
+    public ActivityProviderController()
+    {
+        // Inicializar a factory para criação de parâmetros
+        _parameterFactory = new ConfigurableParameterFactory();
+    }
+
     /// <summary>
     /// Retorna a página de configuração da atividade (HTML).
     /// </summary>
     [HttpGet("config_url")]
     public ActionResult GetConfigurationPage()
     {
+        // Método original para retornar a página HTML de configuração (sem alterações)
         string htmlContent = "<!DOCTYPE html>" +
                              "<html>" +
                              "<head>" +
@@ -60,24 +72,25 @@ public class ActivityProviderController : ControllerBase
         return Content(htmlContent, "text/html; charset=utf-8");
     }
 
-
     /// <summary>
-    /// Retorna os parâmetros configuráveis no formato JSON.
+    /// Retorna os parâmetros configuráveis no formato JSON, usando Factory Method.
     /// </summary>
     [HttpGet("json_params_url")]
     public IActionResult GetJsonParams()
     {
-        var parameters = new List<object>
-    {
-        new { name = "tipo_exercicio", type = "text/plain" },
-        new { name = "nivel_dificuldade", type = "integer" },
-        new { name = "objetivo_atividade", type = "text/plain" },
-        new { name = "tempo_estimado", type = "integer" },
-        new { name = "instrucoes_exercicio", type = "text/plain" },
-        new { name = "numero_questoes", type = "integer" },
-        new { name = "link_material_apoio", type = "URL" }
-    };
+        // Criar os parâmetros configuráveis com a factory
+        var parameters = new List<IConfigurableParameter>
+        {
+            _parameterFactory.CreateParameter("tipo_exercicio", "text/plain"),
+            _parameterFactory.CreateParameter("nivel_dificuldade", "integer"),
+            _parameterFactory.CreateParameter("objetivo_atividade", "text/plain"),
+            _parameterFactory.CreateParameter("tempo_estimado", "integer"),
+            _parameterFactory.CreateParameter("instrucoes_exercicio", "text/plain"),
+            _parameterFactory.CreateParameter("numero_questoes", "integer"),
+            _parameterFactory.CreateParameter("link_material_apoio", "URL")
+        };
 
+        // Retornar os parâmetros no formato JSON
         return Ok(parameters);
     }
 
@@ -87,8 +100,10 @@ public class ActivityProviderController : ControllerBase
     [HttpGet("user_url")]
     public IActionResult DeployActivity(int activityID)
     {
+        // Gerar a URL da atividade com base no ID fornecido
         string activityUrl = $"https://speakify-u5hk.onrender.com?activity={activityID}";
 
+        // Retornar a URL no formato JSON
         return Ok(new { url = activityUrl });
     }
 
@@ -98,22 +113,24 @@ public class ActivityProviderController : ControllerBase
     [HttpPost("analytics_url")]
     public IActionResult GetActivityAnalytics([FromBody] int activityID)
     {
-        // Dados simulados
+        // Obter dados simulados da classe StudentAnalyticsData
         var allAnalytics = StudentAnalyticsData.GetAllAnalytics();
 
-        // Filtrar o resultado com base no ID da Activity
+        // Filtrar os dados com base no ID da atividade
         var activityAnalytics = allAnalytics.Find(analytics => analytics.ActivityID == activityID);
 
+        // Se não for encontrado, retornar erro 404
         if (activityAnalytics == null)
         {
             return NotFound(new { message = "Nenhum dado encontrado para o ID da Atividade fornecido." });
         }
 
+        // Retornar os dados analíticos
         return Ok(activityAnalytics);
     }
 
     /// <summary>
-    /// Retorna a lista de analytics disponíveis.
+    /// Retorna a lista de analytics disponíveis, usando Factory Method.
     /// </summary>
     [HttpGet("analytics_list_url")]
     public IActionResult GetAnalyticsList()
@@ -122,17 +139,17 @@ public class ActivityProviderController : ControllerBase
         {
             quantAnalytics = new[]
             {
-                new { name = "Tempo total dedicado", type = "float" },
-                new { name = "Número de atividades concluídas", type = "integer" },
-                new { name = "Pontuação média", type = "float" },
-                new { name = "Número de tentativas", type = "integer" },
-                new { name = "Frequência de acesso", type = "integer" }
+                _parameterFactory.CreateAnalytics("Tempo total dedicado", "quantitative"),
+                _parameterFactory.CreateAnalytics("Número de atividades concluídas", "quantitative"),
+                _parameterFactory.CreateAnalytics("Pontuação média", "quantitative"),
+                _parameterFactory.CreateAnalytics("Número de tentativas", "quantitative"),
+                _parameterFactory.CreateAnalytics("Frequência de acesso", "quantitative")
             },
             qualAnalytics = new[]
             {
-                new { name = "Comentários sobre o progresso", type = "text/plain" },
-                new { name = "Sugestões para melhoria", type = "text/plain" },
-                new { name = "Feedback qualitativo do aluno", type = "text/plain" },
+                _parameterFactory.CreateAnalytics("Comentários sobre o progresso", "qualitative"),
+                _parameterFactory.CreateAnalytics("Sugestões para melhoria", "qualitative"),
+                _parameterFactory.CreateAnalytics("Feedback qualitativo do aluno", "qualitative"),
             }
         };
 
@@ -145,11 +162,9 @@ public class ActivityProviderController : ControllerBase
     [HttpPost("provide_student_activity_url")]
     public IActionResult StudentAccess([FromBody] StudentAccessRequest requestData)
     {
-        // Tratamento da lógica toda da instanciação do exercício e da acção do estudante na resolução
-        return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizada pelo aluno com ID " + requestData.InveniraStdID + 
-            " no URL: " + $"https://speakify-u5hk.onrender.com?activity={requestData.ActivityID}&studentID={requestData.InveniraStdID}");
+        // Simular o registo do estudante no sistema e retornar a URL da atividade
+        return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizado pelo aluno com ID " +
+            requestData.InveniraStdID + " no URL: " +
+            $"https://speakify-u5hk.onrender.com?activity={requestData.ActivityID}&studentID={requestData.InveniraStdID}");
     }
-
-   
 }
-
