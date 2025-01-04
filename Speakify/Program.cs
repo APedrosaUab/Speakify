@@ -2,7 +2,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Registo do IParameterFactory e das implementações de Facades
+builder.Services.AddScoped<Speakify.Interfaces.IParameterFactory, Speakify.Implementations.ConfigurableParameterFactory>();
+builder.Services.AddScoped<Speakify.Facades.AnalyticsFacade>();
+builder.Services.AddScoped<Speakify.Facades.ConfigurationFacade>();
+builder.Services.AddScoped<Speakify.Facades.RealizationFacade>();
+
+// Configuração do Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -1,60 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Speakify.Implementations;
-using Speakify.Interfaces;
-using Speakify.Models;
+using Speakify.Facades;
 
 [ApiController]
 [Route("api/ap-analytics")]
 public class APAnalyticsController : ControllerBase
 {
-    private readonly IParameterFactory _parameterFactory;
+    private readonly AnalyticsFacade _analyticsFacade;
 
-    public APAnalyticsController()
+    public APAnalyticsController(AnalyticsFacade analyticsFacade)
     {
-        _parameterFactory = new ConfigurableParameterFactory();
+        _analyticsFacade = analyticsFacade;
     }
 
     /// <summary>
-    /// Retorna os dados analíticos da atividade.
+    /// Retorna os dados analíticos de uma atividade específica.
     /// </summary>
     [HttpPost("analytics_url")]
-    public IActionResult GetActivityAnalytics([FromBody] int activityID)
+    public IActionResult GetActivityAnalytics([FromBody] int? activityID)
     {
-        var allAnalytics = StudentAnalyticsData.GetAllAnalytics();
-        var activityAnalytics = allAnalytics.Find(analytics => analytics.ActivityID == activityID);
+        var analytics = _analyticsFacade.GetActivityAnalytics(activityID);
 
-        if (activityAnalytics == null)
+        if (analytics == null || !analytics.Any())
         {
-            return NotFound(new { message = "Nenhum dado encontrado para o ID da Atividade fornecido." });
+            if (activityID != null)
+            {
+                return NotFound(new { message = "Nenhum dado encontrado para o ID da Atividade fornecido." });
+            }
+            else
+            {
+                return NotFound(new { message = "Nenhum dado encontrado." });
+            }
+
         }
 
-        return Ok(activityAnalytics);
+        return Ok(analytics);
     }
 
     /// <summary>
-    /// Retorna a lista de analytics disponíveis, usando Factory Method.
+    /// Retorna a lista de analytics disponíveis.
     /// </summary>
     [HttpGet("analytics_list_url")]
     public IActionResult GetAnalyticsList()
     {
-        var analytics = new
-        {
-            quantAnalytics = new[]
-            {
-                _parameterFactory.CreateAnalytics("Tempo total dedicado", "quantitative"),
-                _parameterFactory.CreateAnalytics("Número de atividades concluídas", "quantitative"),
-                _parameterFactory.CreateAnalytics("Pontuação média", "quantitative"),
-                _parameterFactory.CreateAnalytics("Número de tentativas", "quantitative"),
-                _parameterFactory.CreateAnalytics("Frequência de acesso", "quantitative")
-            },
-            qualAnalytics = new[]
-            {
-                _parameterFactory.CreateAnalytics("Comentários sobre o progresso", "qualitative"),
-                _parameterFactory.CreateAnalytics("Sugestões para melhoria", "qualitative"),
-                _parameterFactory.CreateAnalytics("Feedback qualitativo do aluno", "qualitative"),
-            }
-        };
-
-        return Ok(analytics);
+        var analyticsList = _analyticsFacade.GetAnalyticsList();
+        return Ok(analyticsList);
     }
 }

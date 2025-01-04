@@ -1,18 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Speakify.Facades;
 using Speakify.Models;
 
 [ApiController]
 [Route("api/ap-realization")]
 public class APRealizationController : ControllerBase
 {
+    private readonly RealizationFacade _realizationFacade;
+
+    public APRealizationController(RealizationFacade realizationFacade)
+    {
+        _realizationFacade = realizationFacade;
+    }
+
     /// <summary>
     /// Realiza o deploy inicial da atividade.
     /// </summary>
     [HttpGet("user_url")]
     public IActionResult DeployActivity(int activityID)
     {
-        string activityUrl = $"https://speakify-u5hk.onrender.com?activity={activityID}";
-        return Ok(new { url = activityUrl });
+        var url = _realizationFacade.GenerateActivityUrl(activityID);
+        return Ok(new { url });
     }
 
     /// <summary>
@@ -21,8 +29,7 @@ public class APRealizationController : ControllerBase
     [HttpPost("provide_student_activity_url")]
     public IActionResult StudentAccess([FromBody] StudentAccessRequest requestData)
     {
-        return Ok("Exercicio número " + requestData.ActivityID + " vai ser realizado pelo aluno com ID " +
-            requestData.InveniraStdID + " no URL: " +
-            $"https://speakify-u5hk.onrender.com?activity={requestData.ActivityID}&studentID={requestData.InveniraStdID}");
+        var url = _realizationFacade.RegisterStudentAccess(requestData.ActivityID, requestData.InveniraStdID);
+        return Ok(new { message = $"Acesso registado: {url}" });
     }
 }
