@@ -1,35 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Speakify.Facades;
-using Speakify.Models;
+using Speakify.Implementations.Observers;
 
-[ApiController]
-[Route("api/ap-realization")]
-public class APRealizationController : ControllerBase
+namespace Speakify.Controllers
 {
-    private readonly RealizationFacade _realizationFacade;
-
-    public APRealizationController(RealizationFacade realizationFacade)
+    [ApiController]
+    [Route("api/ap-realization")]
+    public class APRealizationController : ControllerBase
     {
-        _realizationFacade = realizationFacade;
-    }
+        private readonly RealizationFacade _realizationFacade;
 
-    /// <summary>
-    /// Realiza o deploy inicial da atividade.
-    /// </summary>
-    [HttpGet("user_url")]
-    public IActionResult DeployActivity(int activityID)
-    {
-        var url = _realizationFacade.GenerateActivityUrl(activityID);
-        return Ok(new { url });
-    }
+        public APRealizationController(
+            RealizationFacade realizationFacade,
+            ActivityAnalyticsObserver analyticsObserver,
+            ActivityLoggingObserver loggingObserver)
+        {
+            _realizationFacade = realizationFacade;
 
-    /// <summary>
-    /// Regista o acesso do estudante à atividade.
-    /// </summary>
-    [HttpPost("provide_student_activity_url")]
-    public IActionResult StudentAccess([FromBody] StudentAccessRequest requestData)
-    {
-        var url = _realizationFacade.RegisterStudentAccess(requestData.ActivityID, requestData.InveniraStdID);
-        return Ok(new { message = $"Acesso registado: {url}" });
+            // Regista os observers
+            _realizationFacade.Attach(analyticsObserver);
+            _realizationFacade.Attach(loggingObserver);
+        }
+
+        [HttpPost("provide_student_activity_url")]
+        public IActionResult StudentAccess([FromBody] Models.StudentAccessRequest requestData)
+        {
+            var url = _realizationFacade.RegisterStudentAccess(requestData.ActivityID, requestData.InveniraStdID);
+            return Ok(new { message = $"Acesso registado: {url}" });
+        }
+
+        [HttpGet("user_url")]
+        public IActionResult DeployActivity(int activityID)
+        {
+            var url = _realizationFacade.GenerateActivityUrl(activityID);
+            return Ok(new { url });
+        }
     }
 }
