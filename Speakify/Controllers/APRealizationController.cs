@@ -12,13 +12,11 @@ namespace Speakify.Controllers
 
         public APRealizationController(
             RealizationFacade realizationFacade,
-            ActivityAnalyticsObserver analyticsObserver,
             ActivityLoggingObserver loggingObserver)
         {
             _realizationFacade = realizationFacade;
 
             // Regista os observers
-            _realizationFacade.Attach(analyticsObserver);
             _realizationFacade.Attach(loggingObserver);
         }
 
