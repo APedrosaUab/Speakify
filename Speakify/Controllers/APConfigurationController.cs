@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Speakify.Facades;
+using Speakify.Interfaces;
 
 [ApiController]
 [Route("api/ap-configuration")]
-public class APConfigurationController : ControllerBase
+public class APConfigurationController : Controller // Herda de Controller para suportar views
 {
-    private readonly ConfigurationFacade _configurationFacade;
+    private readonly IConfigurationFacade _configurationFacade;
 
-    public APConfigurationController(ConfigurationFacade configurationFacade)
+    public APConfigurationController(IConfigurationFacade configurationFacade)
     {
         _configurationFacade = configurationFacade;
     }
@@ -18,8 +19,8 @@ public class APConfigurationController : ControllerBase
     [HttpGet("config_url")]
     public IActionResult GetConfigurationPage()
     {
-        var htmlContent = _configurationFacade.GetConfigurationPageHtml();
-        return Content(htmlContent, "text/html; charset=utf-8");
+        // Retorna a view diretamente (a geração de HTML é feita pela view)
+        return View("~/Views/Configuration/ConfigurationPage.cshtml");
     }
 
     /// <summary>
